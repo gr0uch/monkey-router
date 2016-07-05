@@ -22,14 +22,14 @@ var go = router({
   'products/*': function () { ... },
   'products/*/pictures': function () { ... },
   'pictures/*': function () { ... }
-}, /* prefix */)
+}/*, prefix */)
 
 // go to the route, without leading or trailing slashes, which invokes all of
 // the intermediate route handlers to get to that route.
 go('products/123/pictures')
 ```
 
-The `prefix` is an optional string that determines what goes in front of the path, without the domain. This will automatically be applied when transitioning to a route. It must not contain leading or trailing slashes.
+The second argument `prefix` is an optional string that determines what goes in front of the path, without the domain. This will automatically be applied when transitioning to a route. It must not contain leading or trailing slashes.
 
 The functions defined as the route handlers will be invoked with one argument: an array containing the wildcard routes in order of appearance.
 
