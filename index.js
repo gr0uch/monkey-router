@@ -11,11 +11,13 @@ module.exports = router
 function router (routes, prefix) {
   var self = this
   var tree = buildTree({}, routes)
-  var event
 
   if (prefix == null) prefix = ''
 
-  if (hasWindow) window.addEventListener('popstate', handler)
+  if (hasWindow) {
+    go.onpopstate = onpopstate
+    window.addEventListener('popstate', onpopstate)
+  }
 
   return go
 
@@ -28,11 +30,13 @@ function router (routes, prefix) {
         '__router__': true
       }, '', delimiter + (prefix ? prefix + delimiter : '') + route)
 
-    traverse(tree, getParts(prefix, route), fns, [])
-    invoke(scope, fns)
+    else {
+      traverse(tree, route.split(delimiter), fns, [])
+      invoke(scope, fns)
+    }
   }
 
-  function handler (event) {
+  function onpopstate (event) {
     var state = event.state
     var fns = []
 
@@ -72,8 +76,8 @@ function traverse (tree, parts, fns, wildcards) {
 }
 
 
-function getParts (prefix, route) {
-  if (route === void 0) route = window.location.pathname.slice(1)
+function getParts (prefix) {
+  var route = window.location.pathname.slice(1)
 
   return (prefix && route.indexOf(prefix) === 0 ?
     route.slice(prefix.length + delimiter.length) : route)
