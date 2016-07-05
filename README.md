@@ -3,7 +3,7 @@
 [![npm Version](https://img.shields.io/npm/v/monkey-router.svg?style=flat-square)](https://www.npmjs.com/package/monkey-router)
 [![License](https://img.shields.io/npm/l/monkey-router.svg?style=flat-square)](https://raw.githubusercontent.com/0x8890/monkey-router/master/LICENSE)
 
-Monkey router is a tree-structured router that traverses all of the branches of a route and invokes each of the intermediate route handlers. Works also in Node.js for single route dispatching.
+Monkey router is a tree-structured router that traverses all of the branches of a route and invokes each of the intermediate route handlers. It works equally well in web browsers and Node.js, except the Node.js version lacks History API support.
 
 ```
 $ npm i monkey-router --save
