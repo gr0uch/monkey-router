@@ -1,6 +1,6 @@
 # Monkey Router
 
-Tree-structured router that traverses all of the branches of a route and invokes each of the intermediate route handlers. Works also in Node.js for single route dispatching.
+Monkey router is a tree-structured router that traverses all of the branches of a route and invokes each of the intermediate route handlers. Works also in Node.js for single route dispatching.
 
 ```
 $ npm i monkey-router --save
