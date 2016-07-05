@@ -3,14 +3,17 @@
   "version": "0.0.1",
   "description": "Web application routing with tree traversal.",
   "scripts": {
-    "test": "eslint index.js && node test"
+    "test": "eslint index.js && node test && npm run test:browser",
+    "test:browser": "browserify test.js | tape-run"
   },
   "author": "0x8890 <0x8890@airmail.cc>",
   "license": "MIT",
   "devDependencies": {
+    "browserify": "^13.0.1",
     "eslint": "^3.0.1",
     "eslint-config-boss": "^1.0.4",
-    "tapdance": "^4.1.2"
+    "tapdance": "^4.1.2",
+    "tape-run": "^2.1.4"
   },
   "eslintConfig": {
     "extends": "boss/es5"

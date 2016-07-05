@@ -1,4 +1,7 @@
 # Monkey Router
+[![Build Status](https://img.shields.io/travis/0x8890/monkey-router/master.svg?style=flat-square)](https://travis-ci.org/0x8890/monkey-router)
+[![npm Version](https://img.shields.io/npm/v/monkey-router.svg?style=flat-square)](https://www.npmjs.com/package/monkey-router)
+[![License](https://img.shields.io/npm/l/monkey-router.svg?style=flat-square)](https://raw.githubusercontent.com/0x8890/monkey-router/master/LICENSE)
 
 Monkey router is a tree-structured router that traverses all of the branches of a route and invokes each of the intermediate route handlers. Works also in Node.js for single route dispatching.
 

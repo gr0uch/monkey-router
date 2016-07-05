@@ -1,9 +1,11 @@
 'use strict'
 
+const hasWindow = typeof window === 'object'
 const tapdance = require('tapdance')
 const router = require('./')
 
 const { run, comment, ok } = tapdance
+const delay = 100 // ms
 
 run(() => {
   comment('router setup')
@@ -18,7 +20,7 @@ run(() => {
       products++
     },
     [ 'products/*/pictures' ] (parameters) {
-      ok(this.foo === 'baz', 'context is correct')
+      ok(this.foo === products > 6 ? 'bar' : 'baz', 'context is correct')
       ok(parameters[0] === '123', 'parameter is correct')
       products++
     },
@@ -27,7 +29,7 @@ run(() => {
       ok(parameters[0] === 'abc', 'parameter is correct')
       pictures++
     }
-  })
+  }, 'prefix')
 
   go('products')
   ok(products === 1, 'route handler invoked')
@@ -40,4 +42,18 @@ run(() => {
 
   go('pictures/abc')
   ok(pictures === 1, 'route handlers invoked')
+
+  return !hasWindow ? null : new Promise(resolve => {
+    comment('browser testing')
+
+    ok(window.history.length === 5, 'history events created')
+    ok(window.location.pathname === '/prefix/pictures/abc', 'prefix used')
+    window.history.back()
+
+    // The `popstate` event works asynchronously.
+    setTimeout(() => {
+      ok(products === 9, 'route handlers invoked')
+      resolve()
+    }, delay)
+  })
 })

@@ -30,10 +30,8 @@ function router (routes, prefix) {
         '__router__': true
       }, '', delimiter + (prefix ? prefix + delimiter : '') + route)
 
-    else {
-      traverse(tree, route.split(delimiter), fns, [])
-      invoke(scope, fns)
-    }
+    traverse(tree, route.split(delimiter), fns, [])
+    invoke(scope, fns)
   }
 
   function onpopstate (event) {
