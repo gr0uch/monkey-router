@@ -1,12 +1,19 @@
 {
   "name": "monkey-router",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web application routing with tree traversal.",
   "scripts": {
     "test": "eslint index.js && node test && npm run test:browser",
     "test:browser": "browserify test.js | tape-run"
   },
-  "author": "0x8890 <0x8890@airmail.cc>",
+  "author": {
+    "email": "0x8890@airmail.cc",
+    "url": "http://0x8890.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:0x8890/monkey-router.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "browserify": "^13.0.1",

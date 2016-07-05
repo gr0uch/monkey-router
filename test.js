@@ -4,7 +4,9 @@ const hasWindow = typeof window === 'object'
 const tapdance = require('tapdance')
 const router = require('./')
 
-const { run, comment, ok } = tapdance
+const run = tapdance.run
+const comment = tapdance.comment
+const ok = tapdance.ok
 const delay = 100 // ms
 
 run(() => {
