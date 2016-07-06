@@ -31,7 +31,7 @@ go('products/123/pictures', { /* state */ })
 
 The second argument to router `prefix` is an optional string that determines what goes in front of the path, without the domain. This will automatically be applied when transitioning to a route. It must not contain leading or trailing slashes.
 
-The functions defined as the route handlers will be invoked with at most two arguments: the first is an array containing the wildcard routes in order of appearance. The second argument is the history state, which is passed only in the browser version.
+The functions defined as the route handlers will be invoked with at most two arguments: the first is an array containing the wildcard routes in order of appearance. The second argument is the history `state`, which is passed as the second argument from the `go` function.
 
 
 ## How It Works
