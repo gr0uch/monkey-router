@@ -21,7 +21,8 @@ run(() => {
       ok(parameters[0] === '123', 'parameter is correct')
       products++
     },
-    [ 'products/*/pictures' ] (parameters) {
+    [ 'products/*/pictures' ] (parameters, state) {
+      if (hasWindow) ok(state.baz === 'qux', 'state is passed')
       ok(this.foo === products > 6 ? 'bar' : 'baz', 'context is correct')
       ok(parameters[0] === '123', 'parameter is correct')
       products++
@@ -39,7 +40,7 @@ run(() => {
   go('products/123')
   ok(products === 3, 'route handlers invoked')
 
-  go.call({ foo: 'baz' }, 'products/123/pictures')
+  go.call({ foo: 'baz' }, 'products/123/pictures', { baz: 'qux' })
   ok(products === 6, 'route handlers invoked')
 
   go('pictures/abc')

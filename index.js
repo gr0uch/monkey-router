@@ -1,6 +1,7 @@
 'use strict'
 
 var hasWindow = typeof window === 'object'
+var internalState = '__router__'
 var delimiter = '/'
 var wildcard = '*'
 
@@ -21,36 +22,42 @@ function router (routes, prefix) {
 
   return go
 
-  function go (route) {
+  function go (route, state) {
     var scope = this || self
     var fns = []
 
-    if (hasWindow)
-      window.history.pushState({
-        '__router__': true
-      }, '', delimiter + (prefix ? prefix + delimiter : '') + route)
+    if (hasWindow) {
+      if (state === void 0) state = {}
+      state[internalState] = true
+      window.history.pushState(state, '',
+        delimiter + (prefix ? prefix + delimiter : '') + route)
+    }
 
     traverse(tree, route.split(delimiter), fns, [])
-    invoke(scope, fns)
+    invoke(scope, fns, state)
   }
 
   function onpopstate (event) {
     var state = event.state
     var fns = []
 
-    if (!(state && '__router__' in state)) return
+    if (!(state && internalState in state)) return
 
     traverse(tree, getParts(prefix), fns, [])
-    invoke(self, fns)
+    invoke(self, fns, state)
   }
 }
 
 
-function invoke (scope, fns) {
+function invoke (scope, fns, state) {
   var i, j
 
-  for (i = 0, j = fns.length; i < j; i++)
-    fns[i][0].call(scope, fns[i][1])
+  if (state === void 0)
+    for (i = 0, j = fns.length; i < j; i++)
+      fns[i][0].call(scope, fns[i][1])
+  else
+    for (i = 0, j = fns.length; i < j; i++)
+      fns[i][0].call(scope, fns[i][1], state)
 }
 
 
