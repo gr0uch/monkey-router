@@ -24,5 +24,14 @@
   },
   "eslintConfig": {
     "extends": "boss/es5"
-  }
+  },
+  "keywords": [
+    "route",
+    "routes",
+    "routing",
+    "router",
+    "browser",
+    "tree",
+    "traversal"
+  ]
 }
