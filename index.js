@@ -1,6 +1,8 @@
 'use strict'
 
+// Browser checking.
 var hasWindow = typeof window === 'object'
+
 var internalState = '__router__'
 var delimiter = '/'
 var wildcard = '*'
@@ -9,6 +11,14 @@ var wildcard = '*'
 module.exports = router
 
 
+/**
+ * This is the main entry point. It returns a function that is used to traverse
+ * the routes.
+ *
+ * @param {Object} routes
+ * @param {String} [prefix]
+ * @return {Function}
+ */
 function router (routes, prefix) {
   var self = this
   var tree = buildTree({}, routes)
@@ -16,12 +26,22 @@ function router (routes, prefix) {
   if (prefix == null) prefix = ''
 
   if (hasWindow) {
-    go.onpopstate = onpopstate
     window.addEventListener('popstate', onpopstate)
+
+    // Expose the event listener function so that it may be manually removed
+    // later if needed.
+    go.onpopstate = onpopstate
   }
 
   return go
 
+  /**
+   * Traverse the routes and invoke the functions in between. If a route is not
+   * found, it will throw an error.
+   *
+   * @param {String} route
+   * @param {Object} [state]
+   */
   function go (route, state) {
     var scope = this || self
     var fns = []
@@ -37,6 +57,7 @@ function router (routes, prefix) {
     invoke(scope, fns, state)
   }
 
+  // Internal event listener function.
   function onpopstate (event) {
     var state = event.state
     var fns = []
@@ -49,6 +70,7 @@ function router (routes, prefix) {
 }
 
 
+// Internal function to invoke route handler functions at once.
 function invoke (scope, fns, state) {
   var i, j
 
@@ -61,6 +83,8 @@ function invoke (scope, fns, state) {
 }
 
 
+// Internal function to collect route handler functions.
+// It calls itself recursively.
 function traverse (tree, parts, fns, wildcards) {
   var fn
 
@@ -81,6 +105,7 @@ function traverse (tree, parts, fns, wildcards) {
 }
 
 
+// Internal function to get the route based on window location.
 function getParts (prefix) {
   var route = window.location.pathname.slice(1)
 
@@ -90,6 +115,8 @@ function getParts (prefix) {
 }
 
 
+// Internal function to build the tree upon calling the main function.
+// It calls itself recursively.
 function buildTree (tree, routes) {
   var nested = {}
   var i, j, position, keys, key, rest
