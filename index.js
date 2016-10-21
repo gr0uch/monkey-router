@@ -22,11 +22,16 @@ module.exports = router
 function router (routes, prefix) {
   var self = this
   var tree = buildTree({}, routes)
+  var currentRoute = [ '' ]
 
-  if (prefix == null) prefix = ''
+  if (prefix === void 0) prefix = ''
 
   if (hasWindow) {
     window.addEventListener('popstate', onpopstate)
+
+    // Set initial route.
+    if (window.location.pathname.length > 1)
+      currentRoute = window.location.pathname.split(delimiter)
 
     // Expose the event listener function so that it may be manually removed
     // later if needed.
@@ -45,62 +50,94 @@ function router (routes, prefix) {
   function go (route, state) {
     var scope = this || self
     var fns = []
+    var nextRoute
 
     if (hasWindow) {
       if (state === void 0) state = {}
       state[internalState] = true
+
+      // Push the new route in the browser, along with the internal state.
       window.history.pushState(state, '',
         delimiter + (prefix ? prefix + delimiter : '') + route)
     }
 
-    traverse(tree, route.split(delimiter), fns, [])
+    nextRoute = route.split(delimiter)
+    traverse(tree, currentRoute, nextRoute.slice(), fns, [])
     invoke(scope, fns, state)
+    currentRoute = nextRoute
   }
 
   // Internal event listener function.
   function onpopstate (event) {
     var state = event.state
     var fns = []
+    var nextRoute
 
+    // Ignore any external history events.
     if (!(state && internalState in state)) return
 
-    traverse(tree, getParts(prefix), fns, [])
+    nextRoute = getParts(prefix)
+    traverse(tree, currentRoute, nextRoute.slice(), fns, [])
     invoke(self, fns, state)
+    currentRoute = nextRoute
   }
 }
 
 
 // Internal function to invoke route handler functions at once.
 function invoke (scope, fns, state) {
-  var i, j
+  var i, tuple
 
-  if (state === void 0)
-    for (i = 0, j = fns.length; i < j; i++)
-      fns[i][0].call(scope, fns[i][1])
-  else
-    for (i = 0, j = fns.length; i < j; i++)
-      fns[i][0].call(scope, fns[i][1], state)
+  for (i = fns.length - 1; i >= 0; i--) {
+    tuple = fns[i]
+    tuple[0].call(scope, tuple[1], tuple[2], state)
+  }
 }
 
 
 // Internal function to collect route handler functions.
-// It calls itself recursively.
-function traverse (tree, parts, fns, wildcards) {
-  var fn
+// It calls itself recursively on each iteration.
+function traverse (tree, currentRoute, parts, fns, wildcards) {
+  var i, j, key
+  var branch = tree
+  var isEntering = false
+  var isHalting = false
 
-  if (parts[0] in tree)
-    fn = tree[parts[0]]
-  else if (wildcard in tree) {
-    fn = tree[wildcard]
-    wildcards.push(parts[0])
+  // Get the current branch by traversing the route tree.
+  for (i = 0, j = parts.length; i < j; i++)
+    if (parts[i] in branch)
+      branch = branch[parts[i]]
+    else if (wildcard in branch) {
+      branch = branch[wildcard]
+      wildcards.push(parts[i])
+    }
+    else throw new Error('Route not found for "' + parts[i] + '".')
+
+  // Try to iteratively turn the current state into the final state.
+  i = Math.max(parts.length, currentRoute.length) - 1
+  if (!(i in parts))
+    if (parts.length &&
+      parts[parts.length - 1] !== currentRoute[parts.length - 1]) {
+      isEntering = true
+      parts.pop()
+    }
+    else {
+      parts.push(currentRoute[parts.length])
+      key = parts[parts.length - 1]
+      if (key in branch) branch = branch[key]
+      else branch = branch[wildcard]
+    }
+  else if (!(i in currentRoute) || parts[i] !== currentRoute[i]) {
+    isEntering = true
+    parts.pop()
   }
+  else isHalting = true
 
-  if (!fn) throw new Error('Route not found.')
-  if (typeof fn === 'function') fns.push([ fn, wildcards.slice() ])
+  if (!isHalting) {
+    if (typeof branch === 'function')
+      fns.push([ branch, isEntering, wildcards.slice() ])
 
-  if (parts.length > 1) {
-    parts.shift()
-    traverse(fn, parts, fns, wildcards)
+    traverse(tree, currentRoute, parts, fns, wildcards)
   }
 }
 
@@ -131,6 +168,9 @@ function buildTree (tree, routes) {
 
       if (key in tree)
         throw new Error('The path "' + key + '" already exists.')
+
+      if (typeof routes[key] !== 'function')
+        throw new TypeError('Route handler must be a function.')
 
       tree[key] = routes[key]
     }
