@@ -88,7 +88,8 @@ run(() => {
     ok(window.location.pathname === '/prefix/pictures/abc', 'prefix used')
     window.history.back()
 
-    // The `popstate` event runs on the next tick.
+    // The `popstate` event runs at some arbitrary time in the future,
+    // depending on the browser. To be safe, it waits for some time.
     setTimeout(() => {
       ok(window.location.pathname === '/prefix/products/123', 'correct route')
       ok(products === 1, 'route handler invoked')
@@ -96,6 +97,6 @@ run(() => {
       ok(productPictures === 0, 'route handler invoked')
       ok(picturesDetail === 0, 'route handler invoked')
       resolve()
-    }, 0)
+    }, 100)
   })
 })
