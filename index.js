@@ -38,6 +38,9 @@ function router (routes, prefix) {
     go.onpopstate = onpopstate
   }
 
+  // Expose internal route state.
+  go.currentRoute = currentRoute
+
   return go
 
   /**
